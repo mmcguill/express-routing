@@ -1,10 +1,9 @@
-A Java Port of Express Style Route to Regex Javascript Library
-
-A port of: https://www.npmjs.com/package/path-to-regexp
+# A Java Port of the Express Routing Library 'path-to-regexp'
+## A port of: https://www.npmjs.com/package/path-to-regexp
 
 A Library to allow matching and parameter extraction from a URL based on an Express style route definition.
 
-Example Usage:
+##### Example Usage:
 
 ```
 @Test
