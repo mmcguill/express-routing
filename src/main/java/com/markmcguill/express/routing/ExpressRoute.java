@@ -18,8 +18,8 @@ public class ExpressRoute {
         "([\\/.])?(?:(?:\\:(\\w+)(?:\\(((?:\\\\.|[^\\\\()])+)\\))?|\\(((?:\\\\.|[^\\\\()])+)\\))([+*?])?|(\\*))"
     }));
 
-    private static final Pattern escapeStringPattern = Pattern.compile("([.+*?=^!:${}()\\[\\]|\\/\\\\])");
-    private static final Pattern escapeGroupPattern = Pattern.compile("([=!:$\\/()])");
+    private static final Pattern escapeStringPattern = Pattern.compile("([.+*?=^!:${}()\\[\\]|/\\\\])");
+    private static final Pattern escapeGroupPattern = Pattern.compile("([=!:$/()])");
 
     private final List<ExpressRouteToken> keys;
     private final Pattern pattern;
@@ -127,8 +127,8 @@ public class ExpressRoute {
 
             // Ignore already escaped sequences.
 
-            if (!isEmpty(escaped)) {
-                path += escaped.substring(0, 1);
+            if (!isEmpty(escaped) && escaped.length() > 1) {
+                path += escaped.substring(1, 2);
                 continue;
             }
 
@@ -184,12 +184,36 @@ public class ExpressRoute {
 
     private static String escapeString(String str) {
         Matcher m = escapeStringPattern.matcher(str);
-        return m.find() ? m.replaceAll("\\" + m.group(1)) : str;
+        List<Integer> findIndex = new ArrayList<>();
+        while (m.find()) {
+            findIndex.add(m.start());
+        }
+        if (findIndex.size() > 0) {
+            StringBuilder stringBuilder = new StringBuilder(str);
+            for (int i = findIndex.size()-1; i >= 0; i--) {
+                stringBuilder.insert(findIndex.get(i), "\\");
+            }
+            return stringBuilder.toString();
+        } else {
+            return str;
+        }
     }
 
     private static String escapeGroup(String group) {
         Matcher m = escapeGroupPattern.matcher(group);
-        return m.find() ? m.replaceAll("\\" + m.group(1)) : group;
+        List<Integer> findIndex = new ArrayList<>();
+        while (m.find()) {
+            findIndex.add(m.start());
+        }
+        if (findIndex.size() > 0) {
+            StringBuilder stringBuilder = new StringBuilder(group);
+            for (int i = findIndex.size()-1; i >= 0; i--) {
+                stringBuilder.insert(findIndex.get(i), "\\");
+            }
+            return stringBuilder.toString();
+        } else {
+            return group;
+        }
     }
 
     public Matcher getMatcher(String path) {
